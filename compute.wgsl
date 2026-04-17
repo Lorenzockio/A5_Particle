@@ -40,7 +40,7 @@ fn cs(@builtin(global_invocation_id) cell:vec3u)  {
   if (released) {
     vel.y = next.y * 7.;
   }
-  if(next.x == 2.){
+  if(next.x >= 2.){
     next.x = -1.; 
   }
 
