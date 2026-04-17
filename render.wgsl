@@ -8,6 +8,7 @@ struct VertexOutput {
   @location(0) uv: vec2f,
   @location(1) shr: f32,
   @location(2) pT: f32,
+  @location(3) velx: f32,
 };
 
 struct Particle {
@@ -28,20 +29,21 @@ fn vs( input: VertexInput ) -> VertexOutput {
   let p = state[ input.instance ];
 
   var shrink = 1.;
-  if (p.pos.x >= -.15) {
+  if (p.pType > 0) {
+    shrink = .1;
+  } else if (p.pos.x >= -.15) {
     shrink = 0.85 - p.pos.x;
   }
 
   out.shr = shrink;
-  var size = input.pos * .15 * shrink;
-  if (p.pType > 0) {
-    size = input.pos * .0075;
-  }
+  let size = input.pos * .15 * shrink;
+  
 
   let aspect = res.y / res.x;
   out.pos = vec4f( p.pos.x - size.x * aspect, p.pos.y + size.y, 0., 1.);
   out.uv = input.pos;
   out.pT = p.pType;
+  out.velx = p.vel.x;
   return out;
 }
 
@@ -51,15 +53,19 @@ fn fs( input: VertexOutput ) -> @location(0) vec4f {
   let dist = length( input.uv );
   if( dist > 1.0 ) { discard; }
   var color: vec3f;
+  var alpha = 1.;
   color = vec3f(1., 0.75, 0.8);
   if( dist < (input.shr - 0.4)) {
     color = vec3f(1., 1., 1.);
   }
   if (input.pT > 0) {
     color = vec3f(1., 0.75, 0.8);
+    if (input.velx < 30) {
+      alpha = 0.;
+    }
   }
   if(input.shr <= 0) {
     color = vec3f(0., 0., 0.);
   }
-  return vec4f(color, 1.);
+  return vec4f(color, alpha);
 }
