@@ -1,6 +1,8 @@
 struct Particle {
   pos: vec2f,
-  vel: vec2f
+  vel: vec2f,   
+  pType: f32,   
+  pad: f32      
 };
 
 @group(0) @binding(0) var<uniform> res:   vec2f;
@@ -24,24 +26,50 @@ fn cs(@builtin(global_invocation_id) cell:vec3u)  {
   vel.y -= 0.01;
 
   var next = p.pos + (2. / res) * vel;
-
+  let t = p.pType;
+  //bottom
   if( next.y <= -1. ) {
     next.y = -1.;
     vel.y *= -1.;
+    if (t > 0) {
+      vel.y = t;
+      vel.x = 36;
+    }
   }
+
+  //top
   if( next.y >= 1. ) {
     next.y = 1.;
     vel.y *= -1.;
+    if (t > 0) {
+      vel.y = -t;
+      vel.x = 36;
+    }
   }
+
+  //hold mouse
   if(mouse.z > 0.5) { 
-    next.x = -1.; 
+    next.x = -1.;
+    next.y = (0.5 - mouse.y) * 2; 
   }
+
+  //release mouse
   let released = prev_mouse.z > 0.5 && mouse.z <= 0.5;
   if (released) {
-    vel.y = next.y * 7.;
+    vel.y = (0.5 - mouse.y) * 14.;
+    vel.x = 12.;
   }
-  if(next.x >= 2.){
-    next.x = -1.; 
+
+  //right side stop
+  if(next.x >= 1.5){
+    vel.x = 0;
+    vel.y = 0;
+  }
+
+  //left side stop - unused
+  if(next.x <= -1.5){
+    vel.x = 0;
+    vel.y = 0;
   }
 
   state[i].pos = next;
