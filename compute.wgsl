@@ -23,7 +23,7 @@ fn cs(@builtin(global_invocation_id) cell:vec3u)  {
   let p = state[ i ];
 
   var vel = p.vel;
-  vel.y -= 0.01;
+  vel.y -= 0.02;
 
   var next = p.pos + (2. / res) * vel;
   let t = p.pType;
