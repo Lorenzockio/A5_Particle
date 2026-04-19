@@ -72,6 +72,14 @@ fn cs(@builtin(global_invocation_id) cell:vec3u)  {
     vel.y = 0;
   }
 
+  //collision
+  if (vel.x > 45) {
+    vel = vec2f(0);
+    next.x = 1.2;
+  } else if(vel.x > 35) {
+    vel.x += 1;
+  }
+
   state[i].pos = next;
   state[i].vel = vel;
 }
